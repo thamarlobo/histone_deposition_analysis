@@ -26,7 +26,7 @@ my @ori_files = ("PATH(S)_TO_ESTIMATED_ORIS.TXT"); # Insert path(s) to estimated
 my @files= ("PATH(S)_TO_DOUBLECLICKSEQ_BAMFILES"); # Insert path(s) to double-click-seq BAM file(s) 
 my $outpath = "./"; # Insert path to output directory
 my $min_mapq = 20; # Mimimal required mapping quality per mapped read. Default = 20
-my $region = 200000;  # Define regionsize (in basepairs) to include to each side of the origin center. Default is 200000
+my $region = 200000;  # Define regionsize (in basepairs) to include to each side of the origin center. Default is 200000. MUST be a multiple of $windowsize!
 my $min_tlen = 145; # SET TO ZERO when data is not paired! Minimum required TLEN when data is paired-end. Default is 145. Should prevent use of readpairs that are too small to originate from a nucleosome.
 my $windowsize= 4000; # Windowsize in basepairs. Default is 4000.
 
