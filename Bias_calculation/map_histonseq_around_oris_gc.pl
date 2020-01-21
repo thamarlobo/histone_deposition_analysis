@@ -5,30 +5,33 @@ use Parallel::ForkManager;
 use POSIX ();
 use Math::Round;
 
-# Script uses double-click-seq data to map histone deposition around estimated origins that are grouped into quantiles based on GC-percentage.
+
+# Script uses double-click-seq data to map histone deposition around estimated origins that are grouped into quantiles based on GC-percentage OR RT-score.
 # The input BAM files must be sorted and duplicates must be marked.
 # Script can deal with BAM files with both single end and paired end data.
-# Origin information can be supplied through estimated_oris.txt (outputfile from get_significant_oris.R) where a last column (column 11) containing the GC-percentage of the region around the origin MUST be added!
+# Origin information can be supplied through estimated_oris.txt (outputfile from get_significant_oris.R) where a last column (column 11) containing either the the GC-percentage OR the RT-score of the region around the origin MUST be added!
+# Script can also be used to quantify OK-seq reads around estimated origins. Just supply path to OK-seq BAM file(s) instead of double-click-seq BAM file(s)
 # Input: 
 # 1. double-click seq BAM file(s). File(s) must be sorted and duplicates must be marked.
-# 2. estimated_oris.txt (outputfile from get_significant_oris.R) where a last column (column 11) containing the GC-percentage of the region around the origin MUST be added.
+# 2. estimated_oris.txt (outputfile from get_significant_oris.R) where a last column (column 11) containing the GC-percentage OR the RT-score of the region around the origin MUST be added.
 # Output: Script generates two outputfiles:
 # 1. *_results.txt contains numbers of fragments mapping to the forward and reverse strand for each bin (that contains any reads) within -$region and $region around each origin. This file is used for bootstrap analysis with bootstrap_bias_gcquantiles.pl
-# 2. *_summedresults.txt contains the summed numbers of fragments mapping to the forward and reverse strand for each bin within -$region and $region across all origins (grouped into qunatiles based on their GC percentage). This file is used for visualizing the average bias across origins.
+# 2. *_summedresults.txt contains the summed numbers of fragments mapping to the forward and reverse strand for each bin within -$region and $region across all origins (grouped into qunatiles based on their GC percentage OR RT-score). This file is used for visualizing the average bias across origins.
 # Outputformat:
-# 1. $chr(=chromosome)  $ori_start(=origin start location)  $ori_stop(=origin_stop_location)   $ori_info{$chr}{$ori_center}{"gc"}(= GC percentage of origin region)    $quantile(= GC quantile)   $ori_info{$chrom}{$center}{"fdr"}(=fdr of origin)   $b(=bin around origin)  $n_f(=number of fragments from forward strand in bin)   $n_r(=number of fragments from reverse strand in bin)   $frvalue(=(($n_f-$n_r)/($n_f+$n_r)). This value is eventually not used)
-# 2. $b(=bin)  $n_f(=summed number of fragments from forward strand)    $n_r(=summed number of fragments from reverse strand)    $frvalue(=(($n_f-$n_r)/($n_f+$n_r)). This value is eventually not used)    $q(=GC quantile). Columns are tab-separated.
+# 1. $chr(=chromosome)  $ori_start(=origin start location)  $ori_stop(=origin_stop_location)   $ori_info{$chr}{$ori_center}{"gc"}(= GC percentage of origin region OR RT-score )    $quantile(= GC quantile OR RT quantile)   $ori_info{$chrom}{$center}{"fdr"}(=fdr of origin)   $b(=bin around origin)  $n_f(=number of fragments from forward strand in bin)   $n_r(=number of fragments from reverse strand in bin)   $frvalue(=(($n_f-$n_r)/($n_f+$n_r)). This value is eventually not used)
+# 2. $b(=bin)  $n_f(=summed number of fragments from forward strand)    $n_r(=summed number of fragments from reverse strand)    $frvalue(=(($n_f-$n_r)/($n_f+$n_r)). This value is eventually not used)    $q(=GC quantile OR RT quantile). Columns are tab-separated.
 #
 # Author: Thamar Jessurun Lobo
 
 # Paths and parameters
-my @ori_files = ("PATH(S)_TO_ESTIMATED_ORIS.TXT"); # Insert path(s) to estimated_oris.txt (output from get_significant_oris.R) with an additional 11th column containing GC information
+my @ori_files = ("PATH(S)_TO_ESTIMATED_ORIS.TXT"); # Insert path(s) to estimated_oris.txt (output from get_significant_oris.R) with an additional 11th column containing GC information OR RT score
 my @files= ("PATH(S)_TO_DOUBLECLICKSEQ_BAMFILES"); # Insert path(s) to double-click-seq BAM file(s) 
 my $outpath = "./"; # Insert path to output directory
 my $min_mapq = 20; # Mimimal required mapping quality per mapped read. Default = 20
 my $region = 200000;  # Define regionsize (in basepairs) to include to each side of the origin center. Default is 200000. MUST be a multiple of $windowsize!
 my $min_tlen = 145; # SET TO ZERO when data is not paired! Minimum required TLEN when data is paired-end. Default is 145. Should prevent use of readpairs that are too small to originate from a nucleosome.
 my $windowsize= 4000; # Windowsize in basepairs. Default is 4000.
+my $type = "GC"; # GC or RT
 
 # For each origin file:
 foreach my $ori_file (@ori_files) {
@@ -136,7 +139,7 @@ foreach my $file(@files) {
         warn "Quantifying histones from $file around origins : $chr \n";
         
         # Open outputfile
-        open F1, '>'.$outpath.$filen."_GC_".$orisample."_scale".$scale."_region".$region."_windowsize".$windowsize."_mintlen".$min_tlen."_chr".$chr."_results.txt";
+        open F1, '>'.$outpath.$filen."_".$type."_".$orisample."_scale".$scale."_region".$region."_windowsize".$windowsize."_mintlen".$min_tlen."_chr".$chr."_results.txt";
 
         # Get diad centers and strandinfo sorted by ascending position
         my @ds = @{ $diads{$chr}{"pos"} };
@@ -220,8 +223,8 @@ foreach my $file(@files) {
     #$pm->wait_all_children; # Uncomment to run in parallel
 
     # Concatenate separate chromosomes outputfiles
-    my $outpattern = $outpath.$filen."_GC_".$orisample."_scale".$scale."_region".$region."_windowsize".$windowsize."_mintlen".$min_tlen."_chr*_results.txt";
-    my $outfn =  $outpath.$filen."_GC_".$orisample."_scale".$scale."_region".$region."_windowsize".$windowsize."_mintlen".$min_tlen."_results.txt";
+    my $outpattern = $outpath.$filen."_".$type."_".$orisample."_scale".$scale."_region".$region."_windowsize".$windowsize."_mintlen".$min_tlen."_chr*_results.txt";
+    my $outfn =  $outpath.$filen."_".$type."_".$orisample."_scale".$scale."_region".$region."_windowsize".$windowsize."_mintlen".$min_tlen."_results.txt";
     system join(' ',
             'cat',
             $outpattern, 
@@ -248,7 +251,7 @@ foreach my $file(@files) {
 		
     # Print fr values for summed dyads to F3 outputfile   
     warn "Writing summed diad counts to outputfile\n";
-    open F3, ">".$outpath.$filen."_GC_".$orisample."_scale".$scale."_region".$region."_windowsize".$windowsize."_mintlen".$min_tlen."_summedresults.txt";
+    open F3, ">".$outpath.$filen."_".$type."_".$orisample."_scale".$scale."_region".$region."_windowsize".$windowsize."_mintlen".$min_tlen."_summedresults.txt";
     foreach my $q (keys %summed_diad_counts){ #gc
         foreach my $b (sort {$a <=> $b} keys %{$summed_diad_counts{$q}}){ #$q = gc
             my $n_f = 0;
