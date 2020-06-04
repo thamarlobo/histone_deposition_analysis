@@ -53,14 +53,8 @@ foreach my $bam ( @bams) {
         next if $flag & 1024; # Ignore marked duplicates
         next if $flag & 256; # Ignore secondary alignments (should not be reported by bowtie2)
         my $strand;
+        $strand =  $flag & 16 ? "-" : "+";
         
-        # Randomize strand information if $randomize = "r"
-        if ($randomize eq "r"){
-            my $random_n = rand();
-            $strand = $random_n < 0.5 ? "-" : "+";
-        }else{
-            $strand =  $flag & 16 ? "-" : "+";
-        }
         $valid_bam_read += 1; # Current valid bam read number
         
         # Get right-end location of read
@@ -73,6 +67,12 @@ foreach my $bam ( @bams) {
         # Determine left-end location of Okazaki fragment that reads must originate from
         my $fragment_start =$strand eq "-"? $stop - ($fragment_size - 1): $pos;
         
+        # Randomize strand information if $randomize= "r"
+	if ($randomize eq "r"){
+            my $random_n = rand();
+            $strand = $random_n < 0.5 ? "-" : "+";
+	}
+	
         # Save info on Okazaki fragment
         $valid_aligned_fragments{$chr}{$valid_bam_read}=$fragment_start;
         $valid_aligned_fragments_info{$valid_bam_read}{"start"}= $fragment_start;
