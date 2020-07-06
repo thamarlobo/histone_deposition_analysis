@@ -11,7 +11,7 @@ use Math::Round;
 # Origin information can be supplied through estimated_oris.txt (outputfile from get_significant_oris.R)
 # Script can also be used to quantify OK-seq reads around estimated origins. Just supply path to OK-seq BAM file(s) instead of double-click-seq BAM file(s)
 # Input: 
-# 1. double-click seq BAM file(s). File(s) must be sorted and duplicates must be marked.
+# 1. double-click seq BAM file(s). File(s) must be sorted, indexed and duplicates must be marked.
 # 2. estimated_oris.txt (outputfile from get_significant_oris.R)
 # Output: Script generates two outputfiles:
 # 1. *_results.txt contains numbers of fragments mapping to the forward and reverse strand for each bin (that contains any reads) within -$region and $region around each origin. This file is used for heatmap visualization of bias for the separate origins. The information is first converted into a matrix with convert_to_matrix.pl, after which it can more easily be visualized with pheatmap (R).
