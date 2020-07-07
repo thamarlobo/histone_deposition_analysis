@@ -5,7 +5,7 @@
 # Script outputs estimated oris (that had a benjamini hochberg adjusted pvalue < 0.01 )
 # Input: *deltarfs.txt from detect_strandswitches.pl
 # Output: *estimated_oris.txt contains information on the significant origins
-# Outputformat: chromosome   start(=origin start)   stop(=origin stop)  ratio(=delta_fr ratio)  deltafr leftf(=number of fragments from forward strand to left of origin)   rightr(=number of fragments from reverse strand to right of origin)	p-value(from binomialtest)	rank	bha-adjusted p-value. Columns are tab-separated.
+# Outputformat: chromosome   start(=origin start)   stop(=origin stop)  ratio(=delta_fr/$scale, in other words: "the origin score")  deltafr leftf(=number of fragments from forward strand to left of origin)   rightr(=number of fragments from reverse strand to right of origin)	p-value(from binomialtest)	rank	bha-adjusted p-value. Columns are tab-separated.
 #
 # Author: Thamar Jessurun Lobo
 # Date: 16-01-2019
