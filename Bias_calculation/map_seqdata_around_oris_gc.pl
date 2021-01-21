@@ -25,7 +25,7 @@ use Math::Round;
 
 # Paths and parameters
 my @ori_files = ("PATH(S)_TO_ESTIMATED_ORIS.TXT"); # Insert path(s) to estimated_oris.txt (output from get_significant_oris.R) with an additional 11th column containing GC information OR RT score
-my @files= ("PATH(S)_TO_DOUBLECLICKSEQ_BAMFILES"); # Insert path(s) to double-click-seq BAM file(s) 
+my @files= ("PATH(S)_TO_DOUBLECLICKSEQ_BAMFILES"); # Insert path(s) to double-click-seq BAM file(s) or OK-seq BAM file(s)
 my $outpath = "./"; # Insert path to output directory
 my $min_mapq = 20; # Mimimal required mapping quality per mapped read. Default = 20
 my $region = 200000;  # Define regionsize (in basepairs) to include to each side of the origin center. Default is 200000. MUST be a multiple of $windowsize!
