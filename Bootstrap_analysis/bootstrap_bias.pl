@@ -4,8 +4,8 @@ use warnings;
 use Parallel::ForkManager;
 use POSIX ();
 
-# Script bootstraps *_results.txt outputfiles of map_histonseq_around_oris.pl 
-# Input: _results.txt outputfile(s) of map_histonseq_around_oris.pl
+# Script bootstraps *_results.txt outputfiles of map_seqdata_around_oris.pl 
+# Input: _results.txt outputfile(s) of map_seqdata_around_oris.pl
 # Output: Outputfile(s) *_bootstrapped.txt contains the summed number of fragments from the forward strand and reverse strand per bin for each bootstrapround
 # Output format: five tab-separated columns: $boot (=bootstrap round), $b (=bin), $n_f (=summed number of fragments from forward strand), $n_r (=summed number of fragments from reverse strand), $frvalue (=frvalue, not used downstream)
 # Outputfile *_bootstrapped.txt can be used to determine the 95 % Confidence Interval by:
@@ -16,7 +16,7 @@ use POSIX ();
 # Author: Thamar Jessurun Lobo
 
 # Paths and parameters
-my @files = ("PATH(S)_TO_RESULTS.TXT"); # Insert path(s) to *_results.txt (map_histonseq_around_oris.pl)
+my @files = ("PATH(S)_TO_RESULTS.TXT"); # Insert path(s) to *_results.txt (map_seqdata_around_oris.pl)
 my $n_rounds = 1000; # Number of bootstrap rounds. Default is 1000
 
 # Get parallel sessions
