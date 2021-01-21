@@ -5,16 +5,16 @@ use Parallel::ForkManager;
 #use Math::Round;
 
 # Script builds a matrix for input into pheatmap (R) 
-# Input: Script expects inputfile *_results.txt as put out by map_histonseq_around_oris_sliding_windows.pl 
-# Output: A matrix with the origin ID in the first column, the deltafr (represents origin strentgh) in the second column, and the percentage of reads from forward strand for each bin around the origin in the following columns.
+# Input: Script expects inputfile *_results.txt as put out by map_seqdata_around_oris_sliding_windows.pl 
+# Output: A matrix with the origin ID in the first column, the deltafr (represents origin strength) in the second column, and the percentage of reads from forward strand for each bin around the origin in the following columns.
 #
 # Author: Thamar Jessurun Lobo
 
 # Paths and parameters
-my @inputfiles = ("PATH(S)_TO_RESULTS.TXT"); # Insert path(s) to *_results.txt (map_histonseq_around_oris_sliding_windows.pl)
+my @inputfiles = ("PATH(S)_TO_RESULTS.TXT"); # Insert path(s) to *_results.txt (map_seqdata_around_oris_sliding_windows.pl)
 my $outpath = "./"; # Insert path to output directory
-my $regionsize = 200000; # Define regionsize (in basepairs) to include to each side of the origin center. Default is 200000. MUST be the same as $region - ($windowsize - $slide)/2 in map_histonseq_around_oris_sliding_windows.pl
-my $binsize = 1000; # Binsize in basepairs. Default is 1000. MUST be the same as $slide in map_histonseq_around_oris_sliding_windows.pl
+my $regionsize = 200000; # Define regionsize (in basepairs) to include to each side of the origin center. Default is 200000. MUST be the same as $region - ($windowsize - $slide)/2 in map_seqdata_around_oris_sliding_windows.pl
+my $binsize = 1000; # Binsize in basepairs. Default is 1000. MUST be the same as $slide in map_seqdata_around_oris_sliding_windows.pl
 my $addtobin = $regionsize/$binsize;
 
 # Get parallel sessions
